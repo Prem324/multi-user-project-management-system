@@ -30,3 +30,4 @@ A production-quality MERN stack application for team collaboration, similar to T
 4. **Run development server**:
    - Backend: `npm run dev` (in server folder)
    - Frontend: `npm run dev` (in client folder)
+ 
