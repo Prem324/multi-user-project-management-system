@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { MoreHorizontal, Plus, Clock, MessageSquare, Paperclip, User as UserIcon } from 'lucide-react';
 import { useProjects } from '../context/ProjectContext';
@@ -7,14 +8,14 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 const KanbanBoard = ({ onTaskClick }) => {
-  const { tasks, setTasks, currentProject, socket } = useProjects(); // Added socket
-  const { user } = useAuth(); // Added useAuth hook
+  const { tasks, setTasks, currentProject, socket } = useProjects();
+  const { user } = useAuth();
 
-  const columns = {
+  const columns = useMemo(() => ({
     Todo: tasks.filter((t) => t.status === 'Todo'),
     'In Progress': tasks.filter((t) => t.status === 'In Progress'),
     Completed: tasks.filter((t) => t.status === 'Completed'),
-  };
+  }), [tasks]);
 
   const onDragEnd = async (result) => {
     if (!result.destination) return;
@@ -134,11 +135,11 @@ const KanbanBoard = ({ onTaskClick }) => {
                               )}
                             </div>
                             {task.dueDate && (
-                              <div className="flex items-center gap-1 text-[10px] font-semibold bg-slate-50 px-2 py-1 rounded-lg">
-                                <Clock size={12} />
-                                <span>{format(new Date(task.dueDate), 'MMM d')}</span>
-                              </div>
-                            )}
+                                <div className="flex items-center gap-1 text-[10px] font-semibold bg-slate-50 px-2 py-1 rounded-lg">
+                                  <Clock size={12} />
+                                  <span>{format(new Date(task.dueDate), 'MMM d')}</span>
+                                </div>
+                              )}
                           </div>
                         </div>
                       )}
