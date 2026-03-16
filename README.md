@@ -32,3 +32,4 @@ A production-quality MERN stack application for team collaboration, similar to T
    - Frontend: `npm run dev` (in client folder)
  
  
+ 
