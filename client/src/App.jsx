@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProjectDetails from './pages/ProjectDetails';
+import Profile from './pages/Profile';
 import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children }) => {
@@ -36,6 +37,7 @@ function App() {
             >
               <Route index element={<Dashboard />} />
               <Route path="project/:id" element={<ProjectDetails />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
         </Router>
