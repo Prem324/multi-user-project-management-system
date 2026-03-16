@@ -64,7 +64,9 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// @desc    Update task
+const cloudinary = require('../config/cloudinary');
+
+// @desc    Update task (and handle attachments)
 // @route   PUT /api/tasks/:id
 // @access  Private
 exports.updateTask = async (req, res) => {
@@ -83,7 +85,24 @@ exports.updateTask = async (req, res) => {
       return res.status(401).json({ message: 'User not authorized' });
     }
 
-    task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+    let updateData = { ...req.body };
+
+    // Handle file upload
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'project_management',
+        resource_type: 'auto',
+      });
+
+      const newAttachment = {
+        url: result.secure_url,
+        name: req.file.originalname,
+      };
+
+      updateData.$push = { attachments: newAttachment };
+    }
+
+    task = await Task.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });
