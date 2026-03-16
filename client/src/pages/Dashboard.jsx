@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { CardSkeleton } from '../components/Skeleton';
 
 const Dashboard = () => {
   const { projects, fetchProjects, loading } = useProjects();
@@ -51,8 +52,10 @@ const Dashboard = () => {
 
   if (loading && projects.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <CardSkeleton key={i} />
+        ))}
       </div>
     );
   }
