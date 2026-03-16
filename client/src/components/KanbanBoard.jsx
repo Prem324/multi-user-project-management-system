@@ -1,10 +1,14 @@
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { MoreHorizontal, Plus, Clock, MessageSquare, Paperclip, User as UserIcon } from 'lucide-react';
 import { useProjects } from '../context/ProjectContext';
+import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const KanbanBoard = ({ onTaskClick }) => {
-  const { tasks, setTasks, currentProject } = useProjects();
+  const { tasks, setTasks, currentProject, socket } = useProjects(); // Added socket
+  const { user } = useAuth(); // Added useAuth hook
 
   const columns = {
     Todo: tasks.filter((t) => t.status === 'Todo'),
@@ -12,7 +16,7 @@ const KanbanBoard = ({ onTaskClick }) => {
     Completed: tasks.filter((t) => t.status === 'Completed'),
   };
 
-  const onDragEnd = (result) => {
+  const onDragEnd = async (result) => { // Made onDragEnd async
     if (!result.destination) return;
 
     const { source, destination, draggableId } = result;
@@ -24,7 +28,28 @@ const KanbanBoard = ({ onTaskClick }) => {
       );
       setTasks(updatedTasks);
 
-      // TODO: API call to update server
+      try {
+        const config = {
+          headers: { Authorization: `Bearer ${user.token}` },
+        };
+        await axios.put(
+          `/api/tasks/${draggableId}`,
+          { status: destination.droppableId },
+          config
+        );
+
+        if (socket) {
+          socket.emit('taskMoved', {
+            projectId: currentProject._id,
+            taskId: draggableId,
+            newStatus: destination.droppableId,
+          });
+        }
+      } catch (error) {
+        toast.error('Failed to update task status');
+        // Revert local state if API fails
+        setTasks(tasks);
+      }
     }
   };
 
