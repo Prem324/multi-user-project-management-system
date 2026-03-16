@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProjects } from '../context/ProjectContext';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { MessageSquare, Paperclip, Send, X, Clock, User as UserIcon, AlertCircle } from 'lucide-react';
+import { MessageSquare, Paperclip, Send, X, Clock, User as UserIcon, AlertCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const TaskModal = ({ task, onClose }) => {
@@ -101,6 +101,22 @@ const TaskModal = ({ task, onClose }) => {
     }
   };
 
+  const handleDeleteTask = async () => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${user.token}` },
+      };
+      await axios.delete(`/api/tasks/${task._id}`, config);
+      toast.success('Task deleted');
+      fetchProjectDetails(task.projectId);
+      onClose();
+    } catch (error) {
+      toast.error('Failed to delete task');
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-end md:justify-center bg-slate-900/40 backdrop-blur-sm p-0 md:p-4">
       <div className="bg-white w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
@@ -117,12 +133,21 @@ const TaskModal = ({ task, onClose }) => {
               <p className="text-xs text-slate-500">In project {task.projectId.title}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
-          >
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDeleteTask}
+              className="p-2 hover:bg-red-50 rounded-full text-slate-400 hover:text-red-600 transition-colors"
+              title="Delete Task"
+            >
+              <Trash2 size={20} />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
