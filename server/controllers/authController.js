@@ -62,6 +62,24 @@ exports.login = async (req, res) => {
   }
 };
 
+// @desc    Search user by email
+// @route   GET /api/auth/search
+// @access  Private
+exports.searchUser = async (req, res) => {
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ email }).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {

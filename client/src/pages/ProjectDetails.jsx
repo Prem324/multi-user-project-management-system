@@ -5,6 +5,7 @@ import KanbanBoard from '../components/KanbanBoard';
 import TaskModal from '../components/TaskModal';
 import TaskFormModal from '../components/TaskFormModal';
 import ActivityPanel from '../components/ActivityPanel';
+import InviteModal from '../components/InviteModal';
 import { Users, Info, Settings, Search, Plus, UserPlus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -13,6 +14,7 @@ const ProjectDetails = () => {
   const { currentProject, fetchProjectDetails, loading } = useProjects();
   const [selectedTask, setSelectedTask] = useState(null);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProjectDetails(id);
@@ -52,7 +54,10 @@ const ProjectDetails = () => {
                 {member.name.charAt(0)}
               </div>
             ))}
-            <button className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 border-2 border-white flex items-center justify-center hover:bg-slate-200 transition-colors">
+            <button
+              onClick={() => setIsInviteModalOpen(true)}
+              className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 border-2 border-white flex items-center justify-center hover:bg-slate-200 transition-colors"
+            >
               <UserPlus size={18} />
             </button>
           </div>
@@ -104,6 +109,13 @@ const ProjectDetails = () => {
         <TaskFormModal
           projectId={id}
           onClose={() => setIsTaskFormOpen(false)}
+        />
+      )}
+      {/* Invite Modal */}
+      {isInviteModalOpen && (
+        <InviteModal
+          projectId={id}
+          onClose={() => setIsInviteModalOpen(false)}
         />
       )}
     </div>
