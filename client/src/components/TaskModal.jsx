@@ -118,7 +118,7 @@ const TaskModal = ({ task, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-end md:justify-center bg-slate-900/40 backdrop-blur-sm p-0 md:p-4">
+    <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-end md:justify-center bg-slate-900/60 backdrop-blur-md p-0 md:p-4">
       <div className="bg-white w-full h-full md:h-auto md:max-w-3xl md:max-h-[85vh] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
