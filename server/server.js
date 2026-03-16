@@ -23,6 +23,8 @@ app.use(morgan('dev'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/comments', require('./routes/commentRoutes'));
+app.use('/api/activity', require('./routes/activityRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running...');
