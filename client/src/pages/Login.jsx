@@ -13,6 +13,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return toast.error('Please enter a valid email address');
+    }
+
     setIsLoading(true);
     try {
       await login(email, password);

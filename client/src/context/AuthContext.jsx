@@ -48,8 +48,28 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateProfile = async (profileData) => {
+    try {
+      const { data } = await api.put('/auth/profile', profileData);
+      setUser(data);
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      await api.delete('/auth/profile');
+      logout();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
