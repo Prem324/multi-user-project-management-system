@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useProjects } from '../context/ProjectContext';
-import { Plus, Users, Calendar, ArrowRight } from 'lucide-react';
+import { Plus, Users, Calendar, ArrowRight, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -29,6 +29,23 @@ const Dashboard = () => {
       fetchProjects();
     } catch (error) {
       toast.error('Failed to create project');
+    }
+  };
+
+  const handleDeleteProject = async (e, projectId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm('Delete this project and all its tasks?')) return;
+
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${user.token}` },
+      };
+      await axios.delete(`/api/projects/${projectId}`, config);
+      toast.success('Project deleted');
+      fetchProjects();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete project');
     }
   };
 
@@ -66,9 +83,19 @@ const Dashboard = () => {
               <div className="bg-primary-50 text-primary-600 p-3 rounded-xl group-hover:bg-primary-600 group-hover:text-white transition-colors">
                 <Users size={24} />
               </div>
-              <span className="text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-600 rounded-full">
-                {project.members.length} Members
-              </span>
+              <div className="flex flex-col items-end gap-2">
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-lg">
+                  {project.members.length} Members
+                </span>
+                {project.owner._id === user._id && (
+                  <button
+                    onClick={(e) => handleDeleteProject(e, project._id)}
+                    className="p-1.5 text-slate-300 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
             </div>
             <h3 className="text-xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors">
               {project.title}
