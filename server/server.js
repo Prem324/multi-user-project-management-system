@@ -12,12 +12,34 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 // Middleware
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
+
+// Socket.IO
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('joinProject', (projectId) => {
+    socket.join(projectId);
+    console.log(`User joined project: ${projectId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -32,6 +54,6 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
