@@ -15,11 +15,13 @@ const projectSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: true,
     },
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+        index: true,
       },
     ],
   },
