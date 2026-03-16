@@ -20,6 +20,16 @@ export const ProjectProvider = ({ children }) => {
       const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
       setSocket(newSocket);
 
+      newSocket.on('taskUpdated', (updatedTask) => {
+        setTasks((prev) =>
+          prev.map((task) => (task._id === updatedTask._id ? updatedTask : task))
+        );
+      });
+
+      newSocket.on('taskCreated', (newTask) => {
+        setTasks((prev) => [...prev, newTask]);
+      });
+
       return () => newSocket.close();
     }
   }, [user]);

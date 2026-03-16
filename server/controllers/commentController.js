@@ -1,5 +1,6 @@
 const Comment = require('../models/Comment');
 const Task = require('../models/Task');
+const { logActivity } = require('./activityLogController');
 
 // @desc    Get comments for a task
 // @route   GET /api/comments/:taskId
@@ -33,6 +34,24 @@ exports.addComment = async (req, res) => {
       userId: req.user.id,
       message,
     });
+
+    const commentWithUser = await Comment.findById(comment._id).populate(
+      'userId',
+      'name email'
+    );
+
+    const io = req.app.get('io');
+    io.to(task.projectId.toString()).emit('newComment', {
+      taskId,
+      comment: commentWithUser,
+    });
+
+    await logActivity(
+      task.projectId,
+      `commented on task "${task.title}"`,
+      req.user.id,
+      io
+    );
 
     res.status(201).json(comment);
   } catch (error) {

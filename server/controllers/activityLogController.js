@@ -16,13 +16,22 @@ exports.getActivityLogs = async (req, res) => {
 };
 
 // Internal utility to log activity
-exports.logActivity = async (projectId, action, performedBy) => {
+exports.logActivity = async (projectId, action, performedBy, io) => {
   try {
-    await ActivityLog.create({
+    const log = await ActivityLog.create({
       projectId,
       action,
       performedBy,
     });
+
+    const populatedLog = await ActivityLog.findById(log._id).populate(
+      'performedBy',
+      'name email'
+    );
+
+    if (io) {
+      io.to(projectId.toString()).emit('newActivity', populatedLog);
+    }
   } catch (error) {
     console.error('Activity Log Error:', error);
   }

@@ -4,6 +4,7 @@ import { useProjects } from '../context/ProjectContext';
 import KanbanBoard from '../components/KanbanBoard';
 import TaskModal from '../components/TaskModal';
 import TaskFormModal from '../components/TaskFormModal';
+import ActivityPanel from '../components/ActivityPanel';
 import { Users, Info, Settings, Search, Plus, UserPlus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -81,8 +82,14 @@ const ProjectDetails = () => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
-        <KanbanBoard onTaskClick={(task) => setSelectedTask(task)} />
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        <div className="flex-1 min-w-0">
+          <KanbanBoard onTaskClick={(task) => setSelectedTask(task)} />
+        </div>
+        
+        <div className="hidden xl:block w-80 shrink-0">
+          <ActivityPanel projectId={id} />
+        </div>
       </div>
 
       {/* Task Details Modal */}

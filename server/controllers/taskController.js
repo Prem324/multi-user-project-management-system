@@ -1,5 +1,6 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const { logActivity } = require('./activityLogController');
 
 // @desc    Get all tasks for a project
 // @route   GET /api/tasks/:projectId
@@ -58,6 +59,11 @@ exports.createTask = async (req, res) => {
       dueDate,
     });
 
+    const io = req.app.get('io');
+    io.to(projectId.toString()).emit('taskCreated', task);
+
+    await logActivity(projectId, `created task: "${task.title}"`, req.user.id, io);
+
     res.status(201).json(task);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -105,7 +111,19 @@ exports.updateTask = async (req, res) => {
     task = await Task.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
-    });
+    }).populate('assignedTo', 'name email');
+
+    const io = req.app.get('io');
+    io.to(task.projectId.toString()).emit('taskUpdated', task);
+
+    if (req.body.status) {
+      await logActivity(
+        task.projectId,
+        `moved task "${task.title}" to ${req.body.status}`,
+        req.user.id,
+        io
+      );
+    }
 
     res.json(task);
   } catch (error) {

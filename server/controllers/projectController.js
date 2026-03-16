@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const { logActivity } = require('./activityLogController');
 
 // @desc    Get all projects for the logged in user
 // @route   GET /api/projects
@@ -55,6 +56,9 @@ exports.createProject = async (req, res) => {
       owner: req.user.id,
       members: [req.user.id],
     });
+
+    const io = req.app.get('io');
+    await logActivity(project._id, 'created the project', req.user.id, io);
 
     res.status(201).json(project);
   } catch (error) {
@@ -137,6 +141,9 @@ exports.addMember = async (req, res) => {
 
     project.members.push(userId);
     await project.save();
+
+    const io = req.app.get('io');
+    await logActivity(project._id, 'added a new member', req.user.id, io);
 
     res.json(project);
   } catch (error) {
