@@ -15,6 +15,12 @@ const ProjectDetails = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredTasks = tasks.filter(task => 
+    task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    task.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     fetchProjectDetails(id);
@@ -74,6 +80,8 @@ const ProjectDetails = () => {
             type="text"
             placeholder="Search tasks..."
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -89,7 +97,7 @@ const ProjectDetails = () => {
 
       <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
         <div className="flex-1 min-w-0">
-          <KanbanBoard onTaskClick={(task) => setSelectedTask(task)} />
+          <KanbanBoard onTaskClick={(task) => setSelectedTask(task)} tasks={filteredTasks} />
         </div>
         
         <div className="hidden xl:block w-80 shrink-0">

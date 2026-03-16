@@ -7,8 +7,9 @@ import { format } from 'date-fns';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-const KanbanBoard = ({ onTaskClick }) => {
-  const { tasks, setTasks, currentProject, socket } = useProjects();
+const KanbanBoard = ({ onTaskClick, tasks: propTasks }) => {
+  const { tasks: contextTasks, setTasks, currentProject, socket } = useProjects();
+  const tasks = propTasks || contextTasks;
   const { user } = useAuth();
 
   const columns = useMemo(() => ({
