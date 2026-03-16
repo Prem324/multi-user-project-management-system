@@ -9,7 +9,7 @@ const connectDB = require('./config/db');
 dotenv.config();
 
 // Connect to database
-// connectDB(); // Will enable once config is ready
+connectDB();
 
 const app = express();
 
@@ -20,6 +20,8 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 // Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
