@@ -16,12 +16,13 @@ const KanbanBoard = ({ onTaskClick }) => {
     Completed: tasks.filter((t) => t.status === 'Completed'),
   };
 
-  const onDragEnd = async (result) => { // Made onDragEnd async
+  const onDragEnd = async (result) => {
     if (!result.destination) return;
 
     const { source, destination, draggableId } = result;
 
     if (source.droppableId !== destination.droppableId) {
+      const previousTasks = [...tasks];
       // Update local state first for instant feedback
       const updatedTasks = tasks.map((t) =>
         t._id === draggableId ? { ...t, status: destination.droppableId } : t
@@ -47,8 +48,8 @@ const KanbanBoard = ({ onTaskClick }) => {
         }
       } catch (error) {
         toast.error('Failed to update task status');
-        // Revert local state if API fails
-        setTasks(tasks);
+        // Revert local state to original if API fails
+        setTasks(previousTasks); 
       }
     }
   };
