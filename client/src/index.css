@@ -19,6 +19,25 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+  border-radius: 8px;
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .container-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 ::-webkit-scrollbar-track {
