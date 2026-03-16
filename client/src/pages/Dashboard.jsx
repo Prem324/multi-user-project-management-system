@@ -78,9 +78,10 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <div
+          <Link
             key={project._id}
-            className="group bg-white rounded-2xl border border-slate-200 p-6 hover:border-primary-300 hover:shadow-xl hover:shadow-slate-200/50 transition-all"
+            to={`/project/${project._id}`}
+            className="group bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
           >
             <div className="flex justify-between items-start mb-4">
               <div className="bg-primary-50 text-primary-600 p-3 rounded-xl group-hover:bg-primary-600 group-hover:text-white transition-colors">
@@ -106,20 +107,17 @@ const Dashboard = () => {
             <p className="text-slate-500 mt-2 line-clamp-2 text-sm leading-relaxed">
               {project.description}
             </p>
-            <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
+            <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between text-slate-400 group-hover:text-primary-600 transition-colors">
+              <div className="flex items-center gap-2 text-sm">
                 <Calendar size={16} />
                 <span>{new Date(project.createdAt).toLocaleDateString()}</span>
               </div>
-              <Link
-                to={`/project/${project._id}`}
-                className="flex items-center gap-1 text-primary-600 font-semibold hover:gap-2 transition-all"
-              >
-                <span>View</span>
+              <div className="flex items-center gap-1 font-semibold text-xs">
+                <span>View Project</span>
                 <ArrowRight size={18} />
-              </Link>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
 
         {projects.length === 0 && (
