@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -10,7 +23,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  @apply bg-slate-50 text-slate-900;
+  background-color: var(--color-slate-50);
+  color: var(--color-slate-900);
 }
 
 /* Custom Scrollbar */
@@ -20,14 +34,12 @@ body {
   border-radius: 8px;
 }
 
-@layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
+@utility scrollbar-hide {
+  &::-webkit-scrollbar {
     display: none;
   }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Mobile optimizations */
@@ -39,22 +51,42 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100;
+  background-color: var(--color-slate-100);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
+  background-color: var(--color-slate-300);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
+  background-color: var(--color-slate-400);
 }
 
 /* Kanban Board Styles */
 .kanban-column {
-  @apply flex flex-col bg-slate-100 rounded-xl p-4 min-w-[300px] w-full max-h-screen overflow-y-auto;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-slate-100);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  min-width: 300px;
+  width: 100%;
+  max-h: 100vh;
+  overflow-y: auto;
 }
 
 .task-card {
-  @apply bg-white p-4 rounded-lg shadow-sm mb-3 border border-slate-200 cursor-pointer hover:shadow-md transition-shadow;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--color-slate-200);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.task-card:hover {
+  box-shadow: var(--shadow-md);
 }
