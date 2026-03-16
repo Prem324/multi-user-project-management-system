@@ -50,6 +50,10 @@ exports.createProject = async (req, res) => {
   try {
     const { title, description } = req.body;
 
+    if (title.length < 3) {
+      return res.status(400).json({ message: 'Title must be at least 3 characters' });
+    }
+
     const project = await Project.create({
       title,
       description,
