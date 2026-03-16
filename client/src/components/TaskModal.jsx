@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProjects } from '../context/ProjectContext';
-import axios from 'axios';
+import api from '../services/api';
 import { format } from 'date-fns';
-import { MessageSquare, Paperclip, Send, X, Clock, User as UserIcon, AlertCircle, Trash2 } from 'lucide-react';
+import { MessageSquare, Paperclip, Send, X, Clock, User as UserIcon, AlertCircle, Trash2, Plus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const TaskModal = ({ task, onClose }) => {
@@ -31,11 +31,8 @@ const TaskModal = ({ task, onClose }) => {
 
   const fetchComments = async () => {
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      const response = await axios.get(`/api/comments/${task._id}`, config);
-      setComments(response.data);
+      const { data } = await api.get(`/comments/${task._id}`);
+      setComments(data);
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
@@ -46,17 +43,13 @@ const TaskModal = ({ task, onClose }) => {
     if (!newComment.trim()) return;
 
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      const response = await axios.post(
-        '/api/comments',
-        { taskId: task._id, message: newComment },
-        config
-      );
+      const { data } = await api.post('/comments', { 
+        taskId: task._id, 
+        message: newComment 
+      });
       
       const commentWithUser = {
-        ...response.data,
+        ...data,
         userId: { _id: user._id, name: user.name, email: user.email }
       };
 
@@ -84,16 +77,12 @@ const TaskModal = ({ task, onClose }) => {
     formData.append('file', file);
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      };
-      await axios.put(`/api/tasks/${task._id}`, formData, config);
+      await api.put(`/tasks/${task._id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       toast.success('File uploaded successfully!');
       fetchProjectDetails(task.projectId);
-      onClose(); // Close to refresh view or refetch local task data
+      onClose();
     } catch (error) {
       toast.error('File upload failed');
     } finally {
@@ -105,10 +94,7 @@ const TaskModal = ({ task, onClose }) => {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
 
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      await axios.delete(`/api/tasks/${task._id}`, config);
+      await api.delete(`/tasks/${task._id}`);
       toast.success('Task deleted');
       fetchProjectDetails(task.projectId);
       onClose();
@@ -130,7 +116,7 @@ const TaskModal = ({ task, onClose }) => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900">{task.title}</h2>
-              <p className="text-xs text-slate-500">In project {task.projectId.title}</p>
+              <p className="text-xs text-slate-500">Task Details</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -167,20 +153,20 @@ const TaskModal = ({ task, onClose }) => {
                   Comments ({comments.length})
                 </h3>
                 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 text-sm">
                   {comments.map((comment) => (
                     <div key={comment._id} className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
-                        {comment.userId.name.charAt(0)}
+                        {comment.userId?.name?.charAt(0) || 'U'}
                       </div>
                       <div className="bg-slate-50 p-3 rounded-2xl rounded-tl-none flex-1 border border-slate-100">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-xs text-slate-900">{comment.userId.name}</span>
+                          <span className="font-bold text-xs text-slate-900">{comment.userId?.name || 'Unknown User'}</span>
                           <span className="text-[10px] text-slate-400">
-                            {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
+                            {comment.createdAt ? format(new Date(comment.createdAt), 'MMM d, h:mm a') : ''}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-700">{comment.message}</p>
+                        <p className="text-slate-700">{comment.message}</p>
                       </div>
                     </div>
                   ))}
@@ -243,7 +229,7 @@ const TaskModal = ({ task, onClose }) => {
                 <div className="grid grid-cols-1 gap-2 mb-3">
                   {task.attachments?.map((file, i) => (
                     <a
-                      key={i}
+                      key={file.url || i}
                       href={file.url}
                       target="_blank"
                       rel="noopener noreferrer"

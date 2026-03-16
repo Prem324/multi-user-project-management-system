@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from './AuthContext';
 import io from 'socket.io-client';
 
@@ -16,8 +16,10 @@ export const ProjectProvider = ({ children }) => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000');
+    if (user && user.token) {
+      const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
+        auth: { token: user.token }
+      });
       setSocket(newSocket);
 
       newSocket.on('taskUpdated', (updatedTask) => {
@@ -35,13 +37,11 @@ export const ProjectProvider = ({ children }) => {
   }, [user]);
 
   const fetchProjects = async () => {
+    if (!user) return;
     setLoading(true);
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      const response = await axios.get('/api/projects', config);
-      setProjects(response.data);
+      const { data } = await api.get('/projects');
+      setProjects(data);
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
@@ -50,16 +50,14 @@ export const ProjectProvider = ({ children }) => {
   };
 
   const fetchProjectDetails = async (id) => {
+    if (!user) return;
     setLoading(true);
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      const response = await axios.get(`/api/projects/${id}`, config);
-      setCurrentProject(response.data);
+      const { data: projectData } = await api.get(`/projects/${id}`);
+      setCurrentProject(projectData);
       
-      const tasksResponse = await axios.get(`/api/tasks/${id}`, config);
-      setTasks(tasksResponse.data);
+      const { data: tasksData } = await api.get(`/tasks/${id}`);
+      setTasks(tasksData);
 
       if (socket) {
         socket.emit('joinProject', id);

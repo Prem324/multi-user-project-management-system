@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useProjects } from '../context/ProjectContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,11 +29,8 @@ const ActivityPanel = ({ projectId }) => {
 
   const fetchLogs = async () => {
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      const response = await axios.get(`/api/activity/${projectId}`, config);
-      setLogs(response.data);
+      const { data } = await api.get(`/activity/${projectId}`);
+      setLogs(data);
     } catch (error) {
       console.error('Error fetching logs:', error);
     } finally {

@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast';
 
 const ProjectDetails = () => {
   const { id } = useParams();
-  const { currentProject, fetchProjectDetails, loading } = useProjects();
+  const { currentProject, fetchProjectDetails, loading, tasks } = useProjects();
   const [selectedTask, setSelectedTask] = useState(null);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);

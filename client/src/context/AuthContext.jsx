@@ -10,9 +10,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('userInfo');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        localStorage.removeItem('userInfo');
+      }
     }
     setLoading(false);
   }, []);
@@ -22,7 +26,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post('/auth/login', { email, password });
       setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
-      return data; // Return the data on success
+      return data;
     } catch (error) {
       throw error;
     }
@@ -33,14 +37,14 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post('/auth/register', { name, email, password });
       setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
-      return data; // Return the data on success
+      return data;
     } catch (error) {
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('userInfo');
     setUser(null);
   };
 

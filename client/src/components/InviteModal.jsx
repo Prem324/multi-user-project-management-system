@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useProjects } from '../context/ProjectContext';
 import { X, Search, UserPlus, Mail, Check } from 'lucide-react';
@@ -18,15 +18,11 @@ const InviteModal = ({ projectId, onClose }) => {
 
     setIsSearching(true);
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      // For simplicity, we'll assume there's a search endpoint
-      // Or we can just use a placeholder logic if we don't want to build full search
-      const response = await axios.get(`/api/auth/search?email=${email}`, config);
-      setFoundUser(response.data);
+      // Use the updated API service that handles /api prefix and auth
+      const { data } = await api.get(`/auth/search?email=${email}`);
+      setFoundUser(data);
     } catch (error) {
-      toast.error('User not found');
+      toast.error(error.response?.data?.message || 'User not found');
       setFoundUser(null);
     } finally {
       setIsSearching(false);
@@ -34,11 +30,9 @@ const InviteModal = ({ projectId, onClose }) => {
   };
 
   const handleInvite = async () => {
+    if (!foundUser) return;
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      await axios.put(`/api/projects/${projectId}/members`, { userId: foundUser._id }, config);
+      await api.put(`/projects/${projectId}/members`, { userId: foundUser._id });
       toast.success('Member added successfully!');
       fetchProjectDetails(projectId);
       onClose();
@@ -49,8 +43,8 @@ const InviteModal = ({ projectId, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <h2 className="text-xl font-bold text-slate-900">Invite Members</h2>
           <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-400">
             <X size={20} />
@@ -66,7 +60,7 @@ const InviteModal = ({ projectId, onClose }) => {
                 <input
                   type="email"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-all"
                   placeholder="e.g. user@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +70,7 @@ const InviteModal = ({ projectId, onClose }) => {
             <button
               type="submit"
               disabled={isSearching}
-              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-100"
             >
               <Search size={18} />
               {isSearching ? 'Searching...' : 'Search User'}
@@ -86,7 +80,7 @@ const InviteModal = ({ projectId, onClose }) => {
           {foundUser && (
             <div className="bg-primary-50 p-4 rounded-xl border border-primary-100 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold shadow-sm">
                   {foundUser.name.charAt(0)}
                 </div>
                 <div>
@@ -96,7 +90,8 @@ const InviteModal = ({ projectId, onClose }) => {
               </div>
               <button
                 onClick={handleInvite}
-                className="bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-lg transition-colors"
+                className="bg-white text-primary-600 border border-primary-200 hover:bg-primary-600 hover:text-white p-2 rounded-lg transition-all duration-200 shadow-sm"
+                title="Add to project"
               >
                 <UserPlus size={20} />
               </button>

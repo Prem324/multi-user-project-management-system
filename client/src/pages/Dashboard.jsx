@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useProjects } from '../context/ProjectContext';
 import { Plus, Users, Calendar, ArrowRight, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { CardSkeleton } from '../components/Skeleton';
@@ -20,10 +20,7 @@ const Dashboard = () => {
   const handleCreateProject = async (e) => {
     e.preventDefault();
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      await axios.post('/api/projects', newProject, config);
+      await api.post('/projects', newProject);
       toast.success('Project created!');
       setIsModalOpen(false);
       setNewProject({ title: '', description: '' });
@@ -39,10 +36,7 @@ const Dashboard = () => {
     if (!window.confirm('Delete this project and all its tasks?')) return;
 
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      await axios.delete(`/api/projects/${projectId}`, config);
+      await api.delete(`/projects/${projectId}`);
       toast.success('Project deleted');
       fetchProjects();
     } catch (error) {
@@ -89,9 +83,9 @@ const Dashboard = () => {
               </div>
               <div className="flex flex-col items-end gap-2">
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-lg">
-                  {project.members.length} Members
+                  {project.members?.length || 0} Members
                 </span>
-                {project.owner._id === user._id && (
+                {project.owner?._id === user?._id && (
                   <button
                     onClick={(e) => handleDeleteProject(e, project._id)}
                     className="p-1.5 text-slate-300 hover:text-red-500 transition-colors"
