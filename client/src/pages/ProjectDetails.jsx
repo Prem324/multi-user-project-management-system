@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProjects } from '../context/ProjectContext';
 import KanbanBoard from '../components/KanbanBoard';
+import TaskModal from '../components/TaskModal';
+import TaskFormModal from '../components/TaskFormModal';
 import { Users, Info, Settings, Search, Plus, UserPlus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -9,6 +11,7 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const { currentProject, fetchProjectDetails, loading } = useProjects();
   const [selectedTask, setSelectedTask] = useState(null);
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
 
   useEffect(() => {
     fetchProjectDetails(id);
@@ -68,7 +71,10 @@ const ProjectDetails = () => {
           />
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-colors">
+          <button
+            onClick={() => setIsTaskFormOpen(true)}
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-colors"
+          >
             <Plus size={18} />
             <span>New Task</span>
           </button>
@@ -79,20 +85,19 @@ const ProjectDetails = () => {
         <KanbanBoard onTaskClick={(task) => setSelectedTask(task)} />
       </div>
 
-      {/* Task Details Modal (Stub) */}
+      {/* Task Details Modal */}
       {selectedTask && (
-        <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-end md:justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white w-full h-5/6 md:h-auto md:max-w-2xl md:max-h-[90vh] rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">{selectedTask.title}</h2>
-              <button onClick={() => setSelectedTask(null)} className="text-slate-400 hover:text-slate-600">Close</button>
-            </div>
-            <div className="p-6 overflow-y-auto">
-                <p>{selectedTask.description}</p>
-                {/* Add comments and details here */}
-            </div>
-          </div>
-        </div>
+        <TaskModal
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+        />
+      )}
+      {/* Task Form Modal */}
+      {isTaskFormOpen && (
+        <TaskFormModal
+          projectId={id}
+          onClose={() => setIsTaskFormOpen(false)}
+        />
       )}
     </div>
   );
