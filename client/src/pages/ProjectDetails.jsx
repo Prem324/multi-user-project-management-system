@@ -1,0 +1,101 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useProjects } from '../context/ProjectContext';
+import KanbanBoard from '../components/KanbanBoard';
+import { Users, Info, Settings, Search, Plus, UserPlus } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+
+const ProjectDetails = () => {
+  const { id } = useParams();
+  const { currentProject, fetchProjectDetails, loading } = useProjects();
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  useEffect(() => {
+    fetchProjectDetails(id);
+  }, [id]);
+
+  if (loading && !currentProject) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!currentProject) return <div>Project not found</div>;
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold text-slate-900">{currentProject.title}</h1>
+            <button className="text-slate-400 hover:text-slate-600 p-1">
+              <Info size={20} />
+            </button>
+          </div>
+          <p className="text-slate-500 max-w-2xl">{currentProject.description}</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex -space-x-3 mr-4">
+            {currentProject.members?.map((member, i) => (
+              <div
+                key={member._id}
+                title={member.name}
+                className="w-10 h-10 rounded-full bg-primary-100 text-primary-600 border-2 border-white flex items-center justify-center font-bold text-sm shadow-sm"
+              >
+                {member.name.charAt(0)}
+              </div>
+            ))}
+            <button className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 border-2 border-white flex items-center justify-center hover:bg-slate-200 transition-colors">
+              <UserPlus size={18} />
+            </button>
+          </div>
+          <button className="bg-white border border-slate-200 p-2.5 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-colors">
+            <Settings size={20} />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+        <div className="relative w-full md:w-96">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-all shadow-sm"
+          />
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-colors">
+            <Plus size={18} />
+            <span>New Task</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0">
+        <KanbanBoard onTaskClick={(task) => setSelectedTask(task)} />
+      </div>
+
+      {/* Task Details Modal (Stub) */}
+      {selectedTask && (
+        <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-end md:justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white w-full h-5/6 md:h-auto md:max-w-2xl md:max-h-[90vh] rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="p-6 border-b flex justify-between items-center">
+              <h2 className="text-xl font-bold">{selectedTask.title}</h2>
+              <button onClick={() => setSelectedTask(null)} className="text-slate-400 hover:text-slate-600">Close</button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+                <p>{selectedTask.description}</p>
+                {/* Add comments and details here */}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProjectDetails;
