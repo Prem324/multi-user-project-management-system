@@ -21,6 +21,7 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/projects', require('./routes/projectRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running...');
